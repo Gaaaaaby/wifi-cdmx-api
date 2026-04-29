@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+venv/
+env/
+.env
+
+# Data files
+data/*.xlsx
+data/*.csv
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
