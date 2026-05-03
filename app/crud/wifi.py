@@ -1,10 +1,10 @@
 """
-Operaciones CRUD usando SQLAlchemy puro con estilo funcional.
-Uso de map(), filter() y lambda en lugar de loops imperativos.
+Operaciones CRUD usando SQLAlchemy.
+Todas las funciones devuelven diccionarios, no objetos ORM.
 """
 
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from sqlalchemy.orm import Session
 from sqlalchemy import text, func
 from app.models.wifi import WifiPoint
@@ -12,21 +12,23 @@ from app.models.wifi import WifiPoint
 logger = logging.getLogger(__name__)
 
 
-def _row_to_dict(row):
-    """Convertir una fila de BD a diccionario (función pura)"""
+def _point_to_dict(point: WifiPoint) -> Dict[str, Any]:
+    """Convertir objeto WifiPoint a diccionario (función pura)"""
+    if point is None:
+        return None
     return {
-        "id": row[0],
-        "external_id": row[1],
-        "programa": row[2],
-        "alcaldia": row[3],
-        "latitud": row[4],
-        "longitud": row[5]
+        "id": point.id,
+        "external_id": point.external_id,
+        "programa": point.programa,
+        "alcaldia": point.alcaldia,
+        "latitud": point.latitud,
+        "longitud": point.longitud
     }
 
 
-def _rows_to_dicts(rows):
-    """Convertir múltiples filas usando map (funcional)"""
-    return list(map(_row_to_dict, rows))
+def _points_to_dicts(points: List[WifiPoint]) -> List[Dict[str, Any]]:
+    """Convertir lista de objetos a lista de diccionarios usando map"""
+    return list(map(_point_to_dict, points))
 
 
 def get_all_paginated(db: Session, page: int = 1, limit: int = 20) -> Dict[str, Any]:
@@ -34,28 +36,21 @@ def get_all_paginated(db: Session, page: int = 1, limit: int = 20) -> Dict[str, 
     offset = (page - 1) * limit
     
     total = db.query(func.count(WifiPoint.id)).scalar()
-    rows = db.query(
-        WifiPoint.id,
-        WifiPoint.external_id,
-        WifiPoint.programa,
-        WifiPoint.alcaldia,
-        WifiPoint.latitud,
-        WifiPoint.longitud
-    ).order_by(WifiPoint.id).offset(offset).limit(limit).all()
+    points = db.query(WifiPoint).order_by(WifiPoint.id).offset(offset).limit(limit).all()
     
-    return {"total": total, "data": _rows_to_dicts(rows)}
+    return {"total": total, "data": _points_to_dicts(points)}
 
 
-def get_by_id(db: Session, id: int) -> Optional[WifiPoint]:
+def get_by_id(db: Session, id: int) -> Optional[Dict[str, Any]]:
     """Obtener un punto WiFi por su ID"""
-    result = db.query(WifiPoint).filter(WifiPoint.id == id).first()
-    return result
+    point = db.query(WifiPoint).filter(WifiPoint.id == id).first()
+    return _point_to_dict(point)
 
 
-def get_by_external_id(db: Session, external_id: str) -> Optional[WifiPoint]:
+def get_by_external_id(db: Session, external_id: str) -> Optional[Dict[str, Any]]:
     """Obtener un punto WiFi por su ID original"""
-    result = db.query(WifiPoint).filter(WifiPoint.external_id == external_id).first()
-    return result
+    point = db.query(WifiPoint).filter(WifiPoint.external_id == external_id).first()
+    return _point_to_dict(point)
 
 
 def get_by_alcaldia_paginated(db: Session, alcaldia: str, page: int = 1, limit: int = 20) -> Dict[str, Any]:
@@ -64,26 +59,15 @@ def get_by_alcaldia_paginated(db: Session, alcaldia: str, page: int = 1, limit: 
     
     query = db.query(WifiPoint).filter(WifiPoint.alcaldia.ilike(f"%{alcaldia}%"))
     total = query.count()
+    points = query.order_by(WifiPoint.id).offset(offset).limit(limit).all()
     
-    rows = query.order_by(WifiPoint.id).offset(offset).limit(limit).all()
-    
-    # Funcional: convertir objetos ORM a dict usando map y lambda
-    data = list(map(lambda p: {
-        "id": p.id,
-        "external_id": p.external_id,
-        "programa": p.programa,
-        "alcaldia": p.alcaldia,
-        "latitud": p.latitud,
-        "longitud": p.longitud
-    }, rows))
-    
-    return {"total": total, "data": data}
+    return {"total": total, "data": _points_to_dicts(points)}
 
 
 def get_nearby_paginated(db: Session, lat: float, lng: float, page: int = 1, limit: int = 20) -> Dict[str, Any]:
     """
     Obtener puntos WiFi ordenados por proximidad a una coordenada.
-    Usa la formula de Haversine con estilo funcional.
+    Usa la formula de Haversine.
     """
     if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
         raise ValueError(f"Coordenadas fuera de rango: lat={lat}, lng={lng}")
@@ -110,8 +94,7 @@ def get_nearby_paginated(db: Session, lat: float, lng: float, page: int = 1, lim
     
     rows = db.execute(sql, {"limit": limit, "offset": offset}).fetchall()
     
-    # Funcional: map con lambda para construir los diccionarios
-    def make_point_with_distance(row):
+    def row_to_dict(row):
         return {
             "id": row[0],
             "external_id": row[1],
@@ -122,6 +105,6 @@ def get_nearby_paginated(db: Session, lat: float, lng: float, page: int = 1, lim
             "distancia": round(row[6], 2) if row[6] else None
         }
     
-    data = list(map(make_point_with_distance, rows))
+    data = list(map(row_to_dict, rows))
     
     return {"total": total, "data": data}

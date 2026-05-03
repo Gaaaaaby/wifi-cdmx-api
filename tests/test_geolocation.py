@@ -8,9 +8,13 @@ import pytest
 
 logger = logging.getLogger(__name__)
 
+'''Harvesine es una formula que calcula la distancia real entre 2 puntos en una esfera
+Funcionamiento de la formula: convierte grados a radianes- 
+calcula la diferencia entre las 2 coordenadas - aplica senos y cosenos -
+multiplica por 6,371 (radio de la tierra en mtros)
+'''
 
 def haversine(lat1, lng1, lat2, lng2):
-    """Formula de Haversine para calcular distancia en metros"""
     R = 6371000
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)

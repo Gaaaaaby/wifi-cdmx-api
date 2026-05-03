@@ -2,11 +2,8 @@
 __pycache__/
 *.py[cod]
 *.so
-.Python
-venv/
-env/
-.env
 
+venv/
 # Data files
 data/*.xlsx
 data/*.csv
@@ -17,3 +14,5 @@ data/*.csv
 
 # Logs
 *.log
+
+.env
