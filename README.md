@@ -81,6 +81,36 @@ python scripts/import_data.py
 uvicorn app.main:app --reload
 ```
 
+## Comandos Make
+
+| `make help` | Muestra todos los comandos disponibles |
+| `make dev` | Ejecuta la API en modo desarrollo (con autorecarga) |
+| `make run` | Ejecuta la API en modo producción |
+| `make test` | Ejecuta todos los tests unitarios |
+| `make import` | Importa los datos del Excel a la base de datos |
+| `make install` | Instala todas las dependencias del proyecto |
+| `make clean` | Limpia archivos temporales (cache, coverage, test.db) |
+| `make init-db` | Crea las tablas en la base de datos |
+
+```bash
+# Instalar dependencias
+make install
+
+# Crear tablas en la base de datos
+make init-db
+
+# Importar datos desde Excel
+make import
+
+# Ejecutar la API en modo desarrollo
+make dev
+
+# Ejecutar tests
+make test
+
+# Limpiar archivos temporales
+make clean
+
 La API estara disponible en:
 - API REST: `http://localhost:8000/api/v1/wifi`
 - GraphQL: `http://localhost:8000/graphql`
