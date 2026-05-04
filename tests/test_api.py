@@ -30,24 +30,24 @@ class TestGetAllWifi:
     def test_returns_400_for_invalid_page(self, client):
         logger.info("Test: page=0 da error")
         response = client.get("/api/v1/wifi/?page=0")
-        assert response.status_code == 422
+        assert response.status_code == 422  
 
     def test_returns_400_for_exceeded_limit(self, client):
         logger.info("Test: limit excedido da error")
         response = client.get("/api/v1/wifi/?limit=1000")
-        assert response.status_code == 422
+        assert response.status_code == 422 
 
 
 class TestGetWifiById:
     def test_returns_200_for_existing_id(self, client, sample_wifi_points):
         logger.info("Test: GET /api/v1/wifi/{id} existente")
-        point_id = sample_wifi_points[0].id
+        point_id = sample_wifi_points[0]["id"] 
         response = client.get(f"/api/v1/wifi/{point_id}")
         assert response.status_code == 200
 
     def test_returns_correct_structure(self, client, sample_wifi_points):
         logger.info("Test: estructura de respuesta")
-        point_id = sample_wifi_points[0].id
+        point_id = sample_wifi_points[0]["id"] 
         response = client.get(f"/api/v1/wifi/{point_id}")
         data = response.json()
         required_fields = ["id", "external_id", "programa", "alcaldia", "latitud", "longitud"]
@@ -63,7 +63,7 @@ class TestGetWifiById:
 class TestGetWifiByExternalId:
     def test_returns_200_for_existing_external_id(self, client, sample_wifi_points):
         logger.info("Test: GET /api/v1/wifi/external/{external_id}")
-        external_id = sample_wifi_points[0].external_id
+        external_id = sample_wifi_points[0]["external_id"]
         response = client.get(f"/api/v1/wifi/external/{external_id}")
         assert response.status_code == 200
 
