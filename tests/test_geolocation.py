@@ -1,5 +1,5 @@
 """
-Pruebas para calculos de geolocalizacion.
+Pruebas para calculos de geolocalizacion con formula harvesine
 """
 
 import logging

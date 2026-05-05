@@ -1,6 +1,6 @@
 """
-Script ETL para cargar datos de puntos WiFi desde Excel a PostgreSQL.
-Estilo funcional: uso de map(), filter(), lambda y funciones puras.
+Script ETL para cargar datos de puntos WiFi desde Excel a PostgreSQL, 
+se hace validacion, conversion, eliminado de duplicados y transformacion de ciertos datos para luego subirlos a la BDD
 """
 
 import os
@@ -31,7 +31,7 @@ def get_connection():
 
 
 def is_valid_coordinate(lat, lng) -> bool:
-    """Validar coordenada (función pura)"""
+    """Validar coordenada"""
     if lat is None or lng is None:
         return False
     try:
@@ -43,7 +43,7 @@ def is_valid_coordinate(lat, lng) -> bool:
 
 
 def row_to_tuple(row) -> tuple:
-    """Convertir fila de DataFrame a tupla para insert (función pura)"""
+    """Convertir fila de DataFrame para inserccion"""
     return (
         row["external_id"],
         row["programa"],
@@ -54,13 +54,13 @@ def row_to_tuple(row) -> tuple:
 
 
 def clean_dataframe(df):
-    """Limpiar y transformar datos usando map/filter (funcional)"""
+    """Limpiar y transformar datos"""
     logger.info(f"Registros originales: {len(df)}")
     
     # Renombrar columna id -> external_id
     df = df.rename(columns={"id": "external_id"})
     
-    # Filtrar filas con coordenadas válidas (funcional)
+    # Filtrar filas con coordenadas válidas 
     df = df[df.apply(lambda row: is_valid_coordinate(row["latitud"], row["longitud"]), axis=1)]
     
     # Eliminar duplicados
@@ -75,11 +75,10 @@ def clean_dataframe(df):
 
 
 def insert_data(df):
-    """Insertar datos usando map para transformar y execute_values"""
+    """Inserccion de datos ya transformados"""
     conn = get_connection()
     cursor = conn.cursor()
     
-    # Funcional: map para convertir DataFrame a lista de tuplas
     data = list(map(row_to_tuple, df.to_dict('records')))
     
     insert_sql = """
@@ -92,7 +91,6 @@ def insert_data(df):
             longitud = EXCLUDED.longitud
     """
     
-    # Batch insert con progreso funcional
     total = len(data)
     for i in range(0, total, BATCH_SIZE):
         batch = data[i:i + BATCH_SIZE]

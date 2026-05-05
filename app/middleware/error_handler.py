@@ -1,6 +1,5 @@
 """
-Middleware global para manejo de errores.
-Centraliza el logging y formato de respuestas de error.
+Middleware global para manejo de errores
 """
 
 import logging
@@ -24,7 +23,6 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
         
         except HTTPException as e:
-            # Excepciones HTTP (404, 400, etc.) - mantener como estan
             self._log_error(request, e, e.status_code)
             return JSONResponse(
                 status_code=e.status_code,
@@ -32,7 +30,6 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             )
         
         except IntegrityError as e:
-            # Error de integridad de BD (constraint violation, duplicados)
             self._log_error(request, e, 409)
             return JSONResponse(
                 status_code=409,
@@ -101,6 +98,6 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             logger.warning(log_message)
     
     def _is_development(self) -> bool:
-        """Detectar si estamos en entorno de desarrollo"""
+        """Deteccion de si estamos en entorno de desarrollo"""
         import os
         return os.getenv("ENVIRONMENT", "development") == "development"

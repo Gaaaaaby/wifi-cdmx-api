@@ -1,5 +1,5 @@
 """
-Modelos Pydantic para validacion y serializacion.
+Modelos para validacion de datos y esquemas de respuestas de los endpoints
 """
 
 from pydantic import BaseModel, Field

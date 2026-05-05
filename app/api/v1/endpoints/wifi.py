@@ -1,5 +1,6 @@
 """
-Endpoints REST usando SQLAlchemy + Pydantic.
+Endpoints REST (Obtencion de todos los puntos de wifi, Obtencion por ID, Obtencion por id_externo(id por default), Obtencion de wifi por alcaldia,
+obtencion de puntos de wifi cercanos x coordenadas).
 """
 
 from fastapi import APIRouter, HTTPException, Query, Depends

@@ -10,12 +10,11 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import StaticPool
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from app.core.database import Base, get_db
 from app.main import app
-from app.models.wifi import WifiPoint  # ✅ MOVER AQUÍ (fuera de la fixture)
+from app.models.wifi import WifiPoint 
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -29,7 +28,6 @@ def engine():
     logger.info("Creando engine de tests")
     engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool, echo=True)
     
-    # Crear todas las tablas
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     logger.info("Tablas creadas correctamente")
@@ -80,7 +78,7 @@ def client(db_session):
 
 @pytest.fixture(scope="function")
 def sample_wifi_points(db_session):
-    """Datos de ejemplo (devuelve diccionarios, no objetos)"""
+    """Datos de ejemplo (devuelve diccionarios)"""
     logger.info("Creando datos de ejemplo")
     points_data = [
         {"external_id": "TEST-001", "programa": "Aeropuerto", "alcaldia": "Venustiano Carranza", "latitud": 19.432707, "longitud": -99.086743},
@@ -96,7 +94,6 @@ def sample_wifi_points(db_session):
         points.append(point)
     db_session.commit()
     
-    # Devolver como diccionarios
     result = []
     for p in points:
         result.append({

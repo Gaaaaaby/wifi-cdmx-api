@@ -1,7 +1,3 @@
-"""
-Conexion a PostgreSQL con SQLAlchemy puro.
-"""
-
 import logging
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, Session
@@ -9,14 +5,17 @@ from sqlalchemy.ext.declarative import declarative_base
 
 logger = logging.getLogger(__name__)
 
-DATABASE_URL = "postgresql://postgres:admin123@localhost:5432/wifi-cdmx"
+# URL FORZADA (no depende de variable de entorno)
+DATABASE_URL = "postgresql://postgres:admin123@db:5432/wifi-cdmx"
 
-engine = create_engine(DATABASE_URL, echo=False)
+logger.info(f"Conectando a base de datos: {DATABASE_URL}")
+
+engine = create_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def init_db() -> None:
+def init_db():
     """Probar la conexion"""
     try:
         with engine.connect() as conn:
@@ -28,19 +27,21 @@ def init_db() -> None:
 
 
 def get_db():
-    """Obtener una sesion (dependency injection)"""
+    """Obtener una sesion (para dependency injection)"""
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-        
+
+
 def get_session():
-    """Obtener una sesion directa (para scripts y GraphQL)"""
+    """Obtener una sesion directa (para GraphQL y scripts)"""
     return SessionLocal()
 
-def close_all_connections() -> None:
-    """Cerrar conexiones"""
+
+def close_all_connections():
+    """Cerrar todas las conexiones"""
     if engine:
         engine.dispose()
         logger.info("Conexiones cerradas")

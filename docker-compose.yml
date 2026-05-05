@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL con PostGIS
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: wifi-cdmx-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: wifi_cdmx_nueva  
+      SQLALCHEMY_DATABASE_URL: postgresql://postgres:admin123@db:5432/wifi-cdmx
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d wifi-cdmx"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API
+  api:
+    build: .
+    container_name: wifi-cdmx-api
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://postgres:admin123@db:5432/wifi-cdmx
+      API_VERSION: v1
+      PAGE_LIMIT_DEFAULT: 20
+      PAGE_LIMIT_MAX: 100
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+    command: >
+      sh -c "
+        python -c 'from app.core.database import Base, engine; Base.metadata.create_all(bind=engine)' &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000
+      "
+  import:
+    build: .
+    container_name: wifi-cdmx-import
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres123@db:5432/wifi-cdmx
+      EXCEL_PATH: data/wifi-cdmx.xlsx
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+    command: python scripts/import_data.py
+    restart: "no"
+
+volumes:
+  postgres_data:

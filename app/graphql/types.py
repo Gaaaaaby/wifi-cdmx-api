@@ -20,8 +20,6 @@ class WifiPointType:
     alcaldia: str
     latitud: float
     longitud: float
-
-
 @strawberry.type
 class WifiPointNearbyType:
     """Tipo GraphQL para punto WiFi con distancia"""
@@ -32,8 +30,6 @@ class WifiPointNearbyType:
     latitud: float
     longitud: float
     distancia: Optional[float]
-
-
 @strawberry.type
 class PaginatedWifiType:
     """Tipo GraphQL para respuesta paginada"""
@@ -41,8 +37,6 @@ class PaginatedWifiType:
     page: int
     limit: int
     data: List[WifiPointType]
-
-
 @strawberry.type
 class PaginatedNearbyType:
     """Tipo GraphQL para respuesta paginada con distancias"""

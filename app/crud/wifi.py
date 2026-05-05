@@ -1,6 +1,6 @@
 """
 Operaciones CRUD usando SQLAlchemy.
-Todas las funciones devuelven diccionarios, no objetos ORM.
+Todas las funciones devuelven diccionarios
 """
 
 import logging
@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def _point_to_dict(point: WifiPoint) -> Dict[str, Any]:
-    """Convertir objeto WifiPoint a diccionario (función pura)"""
+    """Convertir objeto WifiPoint a diccionario"""
     if point is None:
         return None
     return {
@@ -27,7 +27,7 @@ def _point_to_dict(point: WifiPoint) -> Dict[str, Any]:
 
 
 def _points_to_dicts(points: List[WifiPoint]) -> List[Dict[str, Any]]:
-    """Convertir lista de objetos a lista de diccionarios usando map"""
+    """Convertir lista de objetos a lista de diccionarios"""
     return list(map(_point_to_dict, points))
 
 
@@ -66,8 +66,7 @@ def get_by_alcaldia_paginated(db: Session, alcaldia: str, page: int = 1, limit: 
 
 def get_nearby_paginated(db: Session, lat: float, lng: float, page: int = 1, limit: int = 20) -> Dict[str, Any]:
     """
-    Obtener puntos WiFi ordenados por proximidad a una coordenada.
-    Usa la formula de Haversine.
+    Obtener puntos WiFi ordenados por proximidad a una coordenada dada.
     """
     if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
         raise ValueError(f"Coordenadas fuera de rango: lat={lat}, lng={lng}")

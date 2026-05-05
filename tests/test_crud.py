@@ -1,5 +1,5 @@
 """
-Pruebas unitarias para operaciones CRUD (versión con diccionarios).
+Pruebas unitarias para operaciones CRUD (version con diccionarios).
 """
 
 import logging

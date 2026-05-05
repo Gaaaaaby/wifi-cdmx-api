@@ -16,18 +16,14 @@ class Settings(BaseSettings):
     Configuracion de la aplicacion.
     Las variables se cargan automaticamente desde .env
     """
-    
-    # Configuracion de Pydantic
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore"
     )
-    
-    # ========================================================================
-    # BASE DE DATOS
-    # ========================================================================
+
     
     DATABASE_URL: str = Field(
         default="postgresql://postgres:postgres@localhost:5432/wifi-cdmx",
@@ -113,5 +109,5 @@ except Exception as e:
     raise
 
 
-# Para mantener compatibilidad con codigo existente
+# Mantener compatibilidad con codigo existente
 config = settings

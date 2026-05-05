@@ -1,5 +1,5 @@
 """
-Entry point de la aplicacion FastAPI con REST + GraphQL.
+Entry point de la aplicacion FastAPI
 """
 
 import logging
@@ -27,13 +27,13 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-#Request ID (primero, para trazabilidad)
+#Request ID
 app.add_middleware(RequestIDMiddleware)
 
-# Error Handler (captura errores)
+# Error Handler
 app.add_middleware(ErrorHandlerMiddleware)
 
-# Rate Limiting (limita peticiones por IP)
+# Limitacion de peticiones por IP
 app.add_middleware(RateLimitMiddleware)
 
 app.add_middleware(
@@ -44,10 +44,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# REST endpoints
 app.include_router(wifi.router, prefix=f"/api/{config.API_VERSION}")
 
-# GraphQL endpoint
+
 graphql_app = GraphQLRouter(schema, context_getter=lambda: {"db": get_session()})
 app.include_router(graphql_app, prefix="/graphql")
 
